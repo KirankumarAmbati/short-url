@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuteify</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        body {
+            margin: 25px;
+        }
+
+        header {
+            background-color:rgb(66, 124, 218);
+            padding: 20px;
+            color: white;
+            font-size: 40px;
+        }
+        input {
+            width: 20%;
+            height: 40px;
+            margin-top: 5px;
+            padding: 5px;
+        }
+        button {
+            padding: 20px 50px;
+            margin: 20px 0;
+            background-color:rgb(66, 124, 218);
+            color: white;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <header>&lt;cuteify /&gt;</header>
+    <div style="margin: 20px 0;">
+        <div style="margin: 20px 0;">
+            <span style="color: red;">*</span>URL:<br /><input type="text" name="URL" id="url" placeholder="Enter the URL to be shortened">
+        </div>
+        <div>
+            <span>Short URL: </span><br /><input type="text" name="Short URL" id="shortUrl" placeholder="Enter the Short URL">
+        </div>
+    </div>
+    <button id='submit'>Let's Cuteify!</button>
+    <p id="result"></p>
+    <script>
+        document.getElementById('submit').addEventListener('click', async function () {
+
+            const url = document.getElementById('url').value;
+            const shortUrl = document.getElementById('shortUrl').value;
+
+            if(!url) {
+                alert('URL is mandatory');
+                return
+            }
+
+            let res = await fetch('/', {
+                method: 'post',
+                headers: {
+                    'content-type': 'application/json'
+                },
+                body: JSON.stringify({ url, shortUrl })
+            })
+
+            res = await res.json();
+
+            console.log({res });
+            
+
+            const resultEle = document.getElementById('result');
+            resultEle.style.color = 'green';
+
+            const href = window.location.origin + '/' + res.shortUrl;
+
+            if(res.status === -1) {
+                resultEle.innerHTML = res.message + `Short URL: <a target="_blank" href=${href}>${href}</a>`
+            } else if(res.status === 200) {
+                resultEle.innerHTML = `Short URL already exists for this URL. Short URL: <a target="_blank" href=${href}>${href}</a>`
+            } else if(res.status === 201) {
+                resultEle.innerHTML = `Short URL created successfully. Short URL: <a target="_blank" href=${href}>${href}</a>`
+            } else {
+                resultEle.innerHTML = `Short URL creation failed. Please try again!`
+                resultEle.style.color = 'red';
+            }
+        })
+    </script>
+</body>
+</html>
